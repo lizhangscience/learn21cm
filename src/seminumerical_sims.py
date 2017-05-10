@@ -19,9 +19,10 @@ def sem_num(dens_cube, sourcelist, Nion=30, Nrec=0, Rmfp=10, boxsize=None):
 	xf = np.zeros(dens_cube.shape)
 	for i in xrange(Rs.size):
 		ra     = Rs[i]
-		kernel = spherical_tophat_kernel(nn, ra)
-		nh_    = c2t.smooth_with_kernel(n_h, kernel)
-		nH_    = c2t.smooth_with_kernel(n_H, kernel)
+		#kernel = spherical_tophat_kernel(nn, ra)
+		kernel = usefuls.put_circle(np.zeros((nn,nn)), [nn/2,nn/2], ra, label=1)
+		nh_    = smooth_with_kernel_3d(n_h, kernel)
+		nH_    = smooth_with_kernel_3d(n_H, kernel)
 		xf[nh_>=nH_*(1+Nrec)] = 1
 		print (i+1)*100/Rs.size, "% completed"
 	xf[nh_<nH_*(1+Nrec)] = (nh_/nH_)[nh_<nH_*(1+Nrec)]
@@ -33,6 +34,13 @@ def spherical_tophat_kernel(size, rad):
 	kernel = usefuls.put_sphere(kernel, center, rad, label=1)
 	kernel /= np.sum(kernel)
 	return kernel
+
+def smooth_with_kernel_3d(array, kernel):
+	assert array.ndim==3 and kernel.ndim==2
+	out = np.zeros(array.shape)
+	for i in xrange(array.shape[0]): out[i,:,:] = c2t.smooth_with_kernel(array[i,:,:], kernel)
+	for j in xrange(array.shape[1]): out[:,j,:] = c2t.smooth_with_kernel(out[:,j,:], kernel)
+	return out
 
 
 	
