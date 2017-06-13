@@ -2,19 +2,20 @@ import numpy as np
 import c2raytools as c2t
 import usefuls
 
-def sem_num(dens_cube, sourcelist, Nion=30, Nrec=0, Rmfp=10, boxsize=None):
+def sem_num(dens_cube, sourcelist, z, Nion=30, Nrec=0, Rmfp=10, boxsize=None):
 	"""
 	@Majumdar et al. (2014)
+	Rmfp: Default is 10 Mpc (proper) from the observations.
 	"""
 	if boxsize is None: boxsize = c2t.conv.LB
-	Mhalos   = Mgrid_2_Msolar(sourcelist[:,3])
+	Mhalos   = usefuls.Mgrid_2_Msolar(sourcelist[:,3])
 	xx,yy,zz = (sourcelist[:,:3].T-1).astype(dtype=np.int)
 	N_h = np.zeros(dens_cube.shape)
 	N_h[xx,yy,zz] = Nion*Mhalos*c2t.const.OmegaB/c2t.const.Omega0/c2t.const.m_p/c2t.const.solar_masses_per_gram
 	nn  = dens_cube.shape[0]
 	n_h = N_h*(nn/boxsize)**3
 	n_H = c2t.const.Mpc**3*dens_cube/c2t.const.m_p
-	G_mfp = Rmfp*nn/boxsize
+	G_mfp = Rmfp*(1.+z)*nn/boxsize
 	Rs = np.arange(G_mfp)+1.
 	xf = np.zeros(dens_cube.shape)
 	for i in xrange(Rs.size):
