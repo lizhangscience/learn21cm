@@ -29,7 +29,7 @@ def put_circle(array, centre, radius, label=1, periodic=True, verbose=False):
 	RR  = ((aw[:,0]-centre[0])**2 + (aw[:,1]-centre[1])**2).reshape(array.shape)
 	array[RR<=radius**2] = label
 	if periodic: 
-		RR2 = (aw[:,0]+nx-centre[0])**2 + (aw[:,1]+ny-centre[1])**2
+		RR2 = ((aw[:,0]+nx-centre[0])**2 + (aw[:,1]+ny-centre[1])**2).reshape(array.shape)
 		array[RR2<=radius**2] = label
 		if verbose: print "Periodic circle of radius", radius, "made at", centre
 	else: 
